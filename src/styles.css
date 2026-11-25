@@ -462,3 +462,38 @@ a {
   }
 }
 
+
+/* ── QuestBoard extras ─────────────────────────────────────────── */
+.qb-confetti {
+  position: fixed;
+  top: -40px;
+  z-index: 100;
+  pointer-events: none;
+  animation: qb-fall 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+
+@keyframes qb-fall {
+  to {
+    transform: translateY(105vh) rotate(540deg);
+    opacity: 0.2;
+  }
+}
+
+.qb-caret {
+  animation: qb-blink 0.9s steps(2) infinite;
+  color: var(--lagoon-deep);
+}
+
+@keyframes qb-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qb-confetti,
+  .qb-caret {
+    animation: none;
+    display: none;
+  }
+}

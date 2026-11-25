@@ -10,11 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthedOracleRouteImport } from './routes/_authed/oracle'
+import { Route as AuthedStatsRouteImport } from './routes/_authed/stats'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as ApiLeaderboardRouteImport } from './routes/api/leaderboard'
+import { Route as ApiQuestsRouteImport } from './routes/api/quests'
+import { Route as ApiQuestsDotcsvRouteImport } from './routes/api/quests[.]csv'
+import { Route as AuthedQuestsIndexRouteImport } from './routes/_authed/quests/index'
+import { Route as AuthedQuestsQuestIdRouteImport } from './routes/_authed/quests/$questId'
+import { Route as AuthedQuestsNewRouteImport } from './routes/_authed/quests/new'
+import { Route as ApiQuestsQuestIdRouteImport } from './routes/api/quests.$questId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -22,31 +38,167 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedOracleRoute = AuthedOracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedStatsRoute = AuthedStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLeaderboardRoute = ApiLeaderboardRouteImport.update({
+  id: '/api/leaderboard',
+  path: '/api/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuestsRoute = ApiQuestsRouteImport.update({
+  id: '/api/quests',
+  path: '/api/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiQuestsDotcsvRoute = ApiQuestsDotcsvRouteImport.update({
+  id: '/api/quests.csv',
+  path: '/api/quests.csv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedQuestsIndexRoute = AuthedQuestsIndexRouteImport.update({
+  id: '/quests/',
+  path: '/quests/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedQuestsQuestIdRoute = AuthedQuestsQuestIdRouteImport.update({
+  id: '/quests/$questId',
+  path: '/quests/$questId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedQuestsNewRoute = AuthedQuestsNewRouteImport.update({
+  id: '/quests/new',
+  path: '/quests/new',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const ApiQuestsQuestIdRoute = ApiQuestsQuestIdRouteImport.update({
+  id: '/$questId',
+  path: '/$questId',
+  getParentRoute: () => ApiQuestsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/oracle': typeof AuthedOracleRoute
+  '/stats': typeof AuthedStatsRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/api/quests': typeof ApiQuestsRouteWithChildren
+  '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/quests/$questId': typeof AuthedQuestsQuestIdRoute
+  '/quests/new': typeof AuthedQuestsNewRoute
+  '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
+  '/quests/': typeof AuthedQuestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/oracle': typeof AuthedOracleRoute
+  '/stats': typeof AuthedStatsRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/api/quests': typeof ApiQuestsRouteWithChildren
+  '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/quests/$questId': typeof AuthedQuestsQuestIdRoute
+  '/quests/new': typeof AuthedQuestsNewRoute
+  '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
+  '/quests': typeof AuthedQuestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
   '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/_authed/oracle': typeof AuthedOracleRoute
+  '/_authed/stats': typeof AuthedStatsRoute
+  '/api/$': typeof ApiSplatRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/api/quests': typeof ApiQuestsRouteWithChildren
+  '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/_authed/quests/$questId': typeof AuthedQuestsQuestIdRoute
+  '/_authed/quests/new': typeof AuthedQuestsNewRoute
+  '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
+  '/_authed/quests/': typeof AuthedQuestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/oracle'
+    | '/stats'
+    | '/api/$'
+    | '/api/leaderboard'
+    | '/api/quests'
+    | '/api/quests.csv'
+    | '/quests/$questId'
+    | '/quests/new'
+    | '/api/quests/$questId'
+    | '/quests/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/oracle'
+    | '/stats'
+    | '/api/$'
+    | '/api/leaderboard'
+    | '/api/quests'
+    | '/api/quests.csv'
+    | '/quests/$questId'
+    | '/quests/new'
+    | '/api/quests/$questId'
+    | '/quests'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/about'
+    | '/login'
+    | '/_authed/oracle'
+    | '/_authed/stats'
+    | '/api/$'
+    | '/api/leaderboard'
+    | '/api/quests'
+    | '/api/quests.csv'
+    | '/_authed/quests/$questId'
+    | '/_authed/quests/new'
+    | '/api/quests/$questId'
+    | '/_authed/quests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  LoginRoute: typeof LoginRoute
+  ApiSplatRoute: typeof ApiSplatRoute
+  ApiLeaderboardRoute: typeof ApiLeaderboardRoute
+  ApiQuestsRoute: typeof ApiQuestsRouteWithChildren
+  ApiQuestsDotcsvRoute: typeof ApiQuestsDotcsvRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -65,22 +224,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/oracle': {
+      id: '/_authed/oracle'
+      path: '/oracle'
+      fullPath: '/oracle'
+      preLoaderRoute: typeof AuthedOracleRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/stats': {
+      id: '/_authed/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof AuthedStatsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/leaderboard': {
+      id: '/api/leaderboard'
+      path: '/api/leaderboard'
+      fullPath: '/api/leaderboard'
+      preLoaderRoute: typeof ApiLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quests': {
+      id: '/api/quests'
+      path: '/api/quests'
+      fullPath: '/api/quests'
+      preLoaderRoute: typeof ApiQuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/quests.csv': {
+      id: '/api/quests.csv'
+      path: '/api/quests.csv'
+      fullPath: '/api/quests.csv'
+      preLoaderRoute: typeof ApiQuestsDotcsvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/quests/': {
+      id: '/_authed/quests/'
+      path: '/quests'
+      fullPath: '/quests/'
+      preLoaderRoute: typeof AuthedQuestsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/quests/$questId': {
+      id: '/_authed/quests/$questId'
+      path: '/quests/$questId'
+      fullPath: '/quests/$questId'
+      preLoaderRoute: typeof AuthedQuestsQuestIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/quests/new': {
+      id: '/_authed/quests/new'
+      path: '/quests/new'
+      fullPath: '/quests/new'
+      preLoaderRoute: typeof AuthedQuestsNewRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/api/quests/$questId': {
+      id: '/api/quests/$questId'
+      path: '/$questId'
+      fullPath: '/api/quests/$questId'
+      preLoaderRoute: typeof ApiQuestsQuestIdRouteImport
+      parentRoute: typeof ApiQuestsRoute
+    }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedOracleRoute: typeof AuthedOracleRoute
+  AuthedStatsRoute: typeof AuthedStatsRoute
+  AuthedQuestsQuestIdRoute: typeof AuthedQuestsQuestIdRoute
+  AuthedQuestsNewRoute: typeof AuthedQuestsNewRoute
+  AuthedQuestsIndexRoute: typeof AuthedQuestsIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedOracleRoute: AuthedOracleRoute,
+  AuthedStatsRoute: AuthedStatsRoute,
+  AuthedQuestsQuestIdRoute: AuthedQuestsQuestIdRoute,
+  AuthedQuestsNewRoute: AuthedQuestsNewRoute,
+  AuthedQuestsIndexRoute: AuthedQuestsIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
+interface ApiQuestsRouteChildren {
+  ApiQuestsQuestIdRoute: typeof ApiQuestsQuestIdRoute
+}
+
+const ApiQuestsRouteChildren: ApiQuestsRouteChildren = {
+  ApiQuestsQuestIdRoute: ApiQuestsQuestIdRoute,
+}
+
+const ApiQuestsRouteWithChildren = ApiQuestsRoute._addFileChildren(
+  ApiQuestsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
   AboutRoute: AboutRoute,
+  LoginRoute: LoginRoute,
+  ApiSplatRoute: ApiSplatRoute,
+  ApiLeaderboardRoute: ApiLeaderboardRoute,
+  ApiQuestsRoute: ApiQuestsRouteWithChildren,
+  ApiQuestsDotcsvRoute: ApiQuestsDotcsvRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

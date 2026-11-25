@@ -1,3 +1,42 @@
+# ⚔️ QuestBoard
+
+A gamified quest log built with TanStack Start. Post your to-dos as quests,
+earn XP when you finish them, level up, climb the leaderboard and ask the
+streaming Oracle what to do next. It is also a field guide: the **Feature Map**
+page (`/about`) lists each TanStack Start feature and the file that uses it.
+
+| Page | What it shows |
+| --- | --- |
+| `/` Tavern | Leaderboard + global stats streamed in with `<Await>` |
+| `/login` | Sign in / sign up (signed HttpOnly cookie session, scrypt passphrases) |
+| `/quests` | Your quest log with validated search params (`?status=&sort=&q=`) |
+| `/quests/new`, `/quests/$questId` | FormData server fns, `useBlocker`, `notFound()`, dynamic `<title>` |
+| `/oracle` | Async-generator server function streamed word by word |
+| `/stats` | `ssr: 'data-only'` page drawing a canvas chart |
+| `/about` | Feature Map, prerendered to static HTML at build time |
+
+### REST API (server routes)
+
+```text
+GET    /api/leaderboard
+GET    /api/quests?status=all|active|done&sort=newest|oldest|xp&q=
+POST   /api/quests            { "title", "notes", "difficulty": "easy|medium|epic" }
+GET    /api/quests/:questId
+PATCH  /api/quests/:questId   (toggle done)
+DELETE /api/quests/:questId
+GET    /api/quests.csv        (download)
+```
+
+Private endpoints use the session cookie. Mutations are CSRF-protected,
+so non-browser clients must send a matching `Origin` header.
+
+### Configuration
+
+- `SESSION_SECRET`: signs session cookies. **Set it in production.**
+- `QUESTBOARD_DATA_FILE`: where data is stored (default `.data/questboard.json`).
+
+---
+
 Welcome to your new TanStack Start app!
 
 # Getting Started
