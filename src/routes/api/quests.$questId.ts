@@ -14,19 +14,19 @@ export const Route = createFileRoute('/api/quests/$questId')({
 		middleware: [apiAuth],
 		handlers: {
 			GET: async ({ params, context }) => {
-				const quest = await findQuest(context.user, params.questId)
+				const quest = await findQuest(context.supabase, params.questId)
 				return quest
 					? Response.json(quest)
 					: Response.json({ error: 'Quest not found' }, { status: 404 })
 			},
 			PATCH: async ({ params, context }) => {
-				const quest = await toggleQuest(context.user, params.questId)
+				const quest = await toggleQuest(context.supabase, params.questId)
 				return quest
 					? Response.json(quest)
 					: Response.json({ error: 'Quest not found' }, { status: 404 })
 			},
 			DELETE: async ({ params, context }) => {
-				const removed = await removeQuest(context.user, params.questId)
+				const removed = await removeQuest(context.supabase, params.questId)
 				return removed
 					? new Response(null, { status: 204 })
 					: Response.json({ error: 'Quest not found' }, { status: 404 })

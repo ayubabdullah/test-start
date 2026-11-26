@@ -101,10 +101,7 @@ function Oracle() {
 					<li>Runtime: {runtime.runtime} on {runtime.platform}</li>
 					<li>Server uptime: {runtime.uptimeSeconds}s</li>
 					<li>Your timezone (sent via middleware sendContext): {runtime.clientTz}</li>
-					<li>
-						SESSION_SECRET configured:{' '}
-						{runtime.secretConfigured ? 'yes ✅' : 'no — using the dev secret ⚠️'}
-					</li>
+					<li>Quests are stored in: {runtime.database}</li>
 				</ul>
 			</section>
 		</main>

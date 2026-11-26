@@ -15,11 +15,13 @@ import {
 	findQuest,
 	globalStats,
 	leaderboard,
-	listQuestsFor,
+	listQuests as listQuestsQuery,
+	myDisplayName,
+	myXp,
 	removeQuest,
 	toggleQuest,
-	xpFor,
 } from '#/server/quests.server'
+import { getSupabase } from '#/server/supabase.server'
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -31,7 +33,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' }).handler(
 		setResponseHeader('Cache-Control', 'public, max-age=10')
 		// Returns `Xp` class instances — revived on the client by the
 		// serialization adapter registered in src/start.ts.
-		return leaderboard()
+		return leaderboard(getSupabase())
 	},
 )
 
@@ -39,7 +41,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' }).handler(
 export const getGlobalStats = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		await sleep(1200)
-		return globalStats()
+		return globalStats(getSupabase())
 	},
 )
 
@@ -51,8 +53,8 @@ export const listQuests = createServerFn({ method: 'GET' })
 	.handler(async ({ data, context }) => {
 		setResponseHeader('Cache-Control', 'private, no-store')
 		const [quests, xp] = await Promise.all([
-			listQuestsFor(context.user, data),
-			xpFor(context.user),
+			listQuestsQuery(context.supabase, data),
+			myXp(context.supabase),
 		])
 		return { quests, xp }
 	})
@@ -61,7 +63,7 @@ export const getQuest = createServerFn({ method: 'GET' })
 	.middleware([requireUser])
 	.validator((input: { id: string }) => parseQuestId(input))
 	.handler(async ({ data, context }) => {
-		const quest = await findQuest(context.user, data.id)
+		const quest = await findQuest(context.supabase, data.id)
 		// Rendered by the route's notFoundComponent.
 		if (!quest) throw notFound()
 		return quest
@@ -71,9 +73,9 @@ export const getMyStats = createServerFn({ method: 'GET' })
 	.middleware([requireUser])
 	.handler(async ({ context }) => {
 		const [daily, xp, quests] = await Promise.all([
-			dailyXp(context.user),
-			xpFor(context.user),
-			listQuestsFor(context.user),
+			dailyXp(context.supabase),
+			myXp(context.supabase),
+			listQuestsQuery(context.supabase),
 		])
 		const byDifficulty = Object.keys(DIFFICULTIES).map((difficulty) => ({
 			difficulty,
@@ -91,16 +93,16 @@ export const getMyStats = createServerFn({ method: 'GET' })
 export const createQuest = createServerFn({ method: 'POST' })
 	.middleware([requireUser])
 	.validator((data: FormData) => parseNewQuest(data))
-	.handler(({ data, context }) => addQuest(context.user, data))
+	.handler(({ data, context }) => addQuest(context.supabase, data))
 
 export const toggleQuestDone = createServerFn({ method: 'POST' })
 	.middleware([requireUser])
 	.validator((input: { id: string }) => parseQuestId(input))
 	.handler(async ({ data, context }) => {
-		const before = await xpFor(context.user)
-		const quest = await toggleQuest(context.user, data.id)
+		const before = await myXp(context.supabase)
+		const quest = await toggleQuest(context.supabase, data.id)
 		if (!quest) throw notFound()
-		const after = await xpFor(context.user)
+		const after = await myXp(context.supabase)
 		return { quest, xp: after, leveledUp: after.level > before.level }
 	})
 
@@ -108,7 +110,7 @@ export const deleteQuest = createServerFn({ method: 'POST' })
 	.middleware([requireUser])
 	.validator((input: { id: string }) => parseQuestId(input))
 	.handler(async ({ data, context }) => {
-		const removed = await removeQuest(context.user, data.id)
+		const removed = await removeQuest(context.supabase, data.id)
 		if (!removed) throw notFound()
 		return { removed }
 	})
@@ -150,15 +152,16 @@ export const consultOracle = createServerFn({ method: 'POST' })
 		return { question }
 	})
 	.handler(async function* ({ data, context }) {
-		const [active, xp] = await Promise.all([
-			listQuestsFor(context.user, { status: 'active', sort: 'xp' }),
-			xpFor(context.user),
+		const [active, xp, name] = await Promise.all([
+			listQuestsQuery(context.supabase, { status: 'active', sort: 'xp' }),
+			myXp(context.supabase),
+			myDisplayName(context.supabase, context.userId),
 		])
 		const seed = hash(data.question + new Date().toDateString())
 		const quest = active[seed % Math.max(active.length, 1)]?.title
 		const fill = (s: string) =>
 			s
-				.replace('{name}', context.user)
+				.replace('{name}', name ?? 'adventurer')
 				.replace('{quest}', quest ?? 'your first quest')
 				.replace('{next}', String(xp.level + 1))
 				.replace('{left}', String(xp.toNextLevel))

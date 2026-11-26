@@ -8,7 +8,7 @@ page (`/about`) lists each TanStack Start feature and the file that uses it.
 | Page | What it shows |
 | --- | --- |
 | `/` Tavern | Leaderboard + global stats streamed in with `<Await>` |
-| `/login` | Sign in / sign up (signed HttpOnly cookie session, scrypt passphrases) |
+| `/login` | Supabase Auth sign in / sign up (email + password, adventurer name) |
 | `/quests` | Your quest log with validated search params (`?status=&sort=&q=`) |
 | `/quests/new`, `/quests/$questId` | FormData server fns, `useBlocker`, `notFound()`, dynamic `<title>` |
 | `/oracle` | Async-generator server function streamed word by word |
@@ -27,13 +27,49 @@ DELETE /api/quests/:questId
 GET    /api/quests.csv        (download)
 ```
 
-Private endpoints use the session cookie. Mutations are CSRF-protected,
+Private endpoints use the Supabase session cookie. Mutations are CSRF-protected,
 so non-browser clients must send a matching `Origin` header.
 
-### Configuration
+### Database & auth: Supabase
 
-- `SESSION_SECRET`: signs session cookies. **Set it in production.**
-- `QUESTBOARD_DATA_FILE`: where data is stored (default `.data/questboard.json`).
+Data lives in Postgres via [Supabase](https://supabase.com), wired the way
+Supabase's TanStack Start guide recommends:
+
+- `@supabase/ssr`'s `createServerClient` stores the Auth session in cookies
+  through Start's `getCookies` / `setCookie` (`src/server/supabase.server.ts`).
+  All Supabase calls happen inside server functions or server routes, so no
+  key is ever shipped to the browser.
+- Every protected server function verifies the JWT with
+  `supabase.auth.getClaims()` (`src/middleware/auth.ts`). Route `beforeLoad`
+  guards are for UX only.
+- Row Level Security in `supabase/migrations/` makes each adventurer's quests
+  private at the database level. The leaderboard and global stats come from
+  `security definer` SQL functions that return aggregates only.
+
+**Local development** (needs Docker and the
+[Supabase CLI](https://supabase.com/docs/guides/local-development)):
+
+```bash
+bun run db:start
+```
+
+```bash
+cp .env.example .env.local
+```
+
+Then paste `API_URL` and `PUBLISHABLE_KEY` from `supabase status -o env`
+into `.env.local`. Local auth skips email confirmation; sent emails show up in
+Mailpit at http://127.0.0.1:54324 and the database in Studio at
+http://127.0.0.1:54323.
+
+- `bun run db:reset` re-applies migrations to a fresh local database.
+- `bun run db:types` regenerates `src/lib/database.types.ts` after a schema change.
+
+**Hosted Supabase:** create a project, run `supabase link` and
+`supabase db push`, set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in your
+host's environment, and add `https://<your-domain>/auth/confirm` to
+Auth → URL Configuration → Redirect URLs (email confirmation is on by default
+for hosted projects).
 
 ---
 

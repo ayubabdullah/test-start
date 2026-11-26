@@ -11,5 +11,9 @@ export const getRuntime = createServerOnlyFn(() => ({
 	platform: `${process.platform}/${process.arch}`,
 	uptimeSeconds: Math.round(process.uptime()),
 	// Server-only env var (no PUBLIC_ prefix): read per request, never shipped.
-	secretConfigured: Boolean(process.env.SESSION_SECRET),
+	database: /^https?:\/\/(127\.0\.0\.1|localhost)/.test(
+		process.env.SUPABASE_URL ?? '',
+	)
+		? 'local Supabase'
+		: 'hosted Supabase',
 }))

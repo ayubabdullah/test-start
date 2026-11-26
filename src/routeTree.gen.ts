@@ -19,6 +19,7 @@ import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as ApiLeaderboardRouteImport } from './routes/api/leaderboard'
 import { Route as ApiQuestsRouteImport } from './routes/api/quests'
 import { Route as ApiQuestsDotcsvRouteImport } from './routes/api/quests[.]csv'
+import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthedQuestsIndexRouteImport } from './routes/_authed/quests/index'
 import { Route as AuthedQuestsQuestIdRouteImport } from './routes/_authed/quests/$questId'
 import { Route as AuthedQuestsNewRouteImport } from './routes/_authed/quests/new'
@@ -73,6 +74,11 @@ const ApiQuestsDotcsvRoute = ApiQuestsDotcsvRouteImport.update({
   path: '/api/quests.csv',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthConfirmRoute = AuthConfirmRouteImport.update({
+  id: '/auth/confirm',
+  path: '/auth/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedQuestsIndexRoute = AuthedQuestsIndexRouteImport.update({
   id: '/quests/',
   path: '/quests/',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/api/quests': typeof ApiQuestsRouteWithChildren
   '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/quests/$questId': typeof AuthedQuestsQuestIdRoute
   '/quests/new': typeof AuthedQuestsNewRoute
   '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/api/quests': typeof ApiQuestsRouteWithChildren
   '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/quests/$questId': typeof AuthedQuestsQuestIdRoute
   '/quests/new': typeof AuthedQuestsNewRoute
   '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/api/quests': typeof ApiQuestsRouteWithChildren
   '/api/quests.csv': typeof ApiQuestsDotcsvRoute
+  '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/quests/$questId': typeof AuthedQuestsQuestIdRoute
   '/_authed/quests/new': typeof AuthedQuestsNewRoute
   '/api/quests/$questId': typeof ApiQuestsQuestIdRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/api/leaderboard'
     | '/api/quests'
     | '/api/quests.csv'
+    | '/auth/confirm'
     | '/quests/$questId'
     | '/quests/new'
     | '/api/quests/$questId'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/api/leaderboard'
     | '/api/quests'
     | '/api/quests.csv'
+    | '/auth/confirm'
     | '/quests/$questId'
     | '/quests/new'
     | '/api/quests/$questId'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/api/leaderboard'
     | '/api/quests'
     | '/api/quests.csv'
+    | '/auth/confirm'
     | '/_authed/quests/$questId'
     | '/_authed/quests/new'
     | '/api/quests/$questId'
@@ -199,6 +211,7 @@ export interface RootRouteChildren {
   ApiLeaderboardRoute: typeof ApiLeaderboardRoute
   ApiQuestsRoute: typeof ApiQuestsRouteWithChildren
   ApiQuestsDotcsvRoute: typeof ApiQuestsDotcsvRoute
+  AuthConfirmRoute: typeof AuthConfirmRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -273,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiQuestsDotcsvRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/confirm': {
+      id: '/auth/confirm'
+      path: '/auth/confirm'
+      fullPath: '/auth/confirm'
+      preLoaderRoute: typeof AuthConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed/quests/': {
       id: '/_authed/quests/'
       path: '/quests'
@@ -344,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLeaderboardRoute: ApiLeaderboardRoute,
   ApiQuestsRoute: ApiQuestsRouteWithChildren,
   ApiQuestsDotcsvRoute: ApiQuestsDotcsvRoute,
+  AuthConfirmRoute: AuthConfirmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

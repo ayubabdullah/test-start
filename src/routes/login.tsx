@@ -1,13 +1,17 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
-import { login } from '#/functions/auth.functions'
+import { signIn, signUp } from '#/functions/auth.functions'
+
+type Mode = 'sign-in' | 'sign-up'
 
 export const Route = createFileRoute('/login')({
-	// Typed, validated search params: /login?redirect=/quests/abc
-	// Only same-site relative paths survive, so ?redirect can't send users
-	// to another origin.
-	validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+	// /login?mode=sign-up&redirect=/quests/abc — parsed and typed. Only
+	// same-site relative paths survive, so ?redirect can't leave the site.
+	validateSearch: (
+		search: Record<string, unknown>,
+	): { mode?: Mode; redirect?: string } => ({
+		mode: search.mode === 'sign-up' ? 'sign-up' : undefined,
 		redirect:
 			typeof search.redirect === 'string' &&
 			search.redirect.startsWith('/') &&
@@ -25,63 +29,120 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
 	const search = Route.useSearch()
-	const loginFn = useServerFn(login)
+	const mode = search.mode ?? 'sign-in'
+	const signInFn = useServerFn(signIn)
+	const signUpFn = useServerFn(signUp)
 	const [error, setError] = useState<string | null>(null)
+	const [checkEmail, setCheckEmail] = useState(false)
 	const [busy, setBusy] = useState(false)
+
+	if (checkEmail) {
+		return (
+			<main className="page-wrap px-4 py-12">
+				<section className="island-shell mx-auto max-w-md rounded-2xl p-6 text-center sm:p-8">
+					<p className="text-5xl">📬</p>
+					<h1 className="display-title mt-3 mb-2 text-3xl font-bold">
+						Check your inbox
+					</h1>
+					<p className="demo-muted">
+						A raven carries your confirmation link. Click it to enter the guild.
+					</p>
+				</section>
+			</main>
+		)
+	}
 
 	return (
 		<main className="page-wrap px-4 py-12">
 			<section className="island-shell mx-auto max-w-md rounded-2xl p-6 sm:p-8">
 				<p className="island-kicker mb-2">The Guild Hall</p>
-				<h1 className="display-title mb-2 text-3xl font-bold">Sign in or join</h1>
-				<p className="demo-muted mb-6 text-sm">
-					New name? It's yours — the passphrase you pick now becomes your key.
-				</p>
+				<h1 className="display-title mb-4 text-3xl font-bold">
+					{mode === 'sign-in' ? 'Welcome back' : 'Join the guild'}
+				</h1>
+
+				<div className="mb-6 flex gap-2" role="tablist">
+					{(['sign-in', 'sign-up'] as const).map((m) => (
+						<Link
+							key={m}
+							from={Route.fullPath}
+							search={(prev) => ({ ...prev, mode: m === 'sign-up' ? m : undefined })}
+							role="tab"
+							aria-selected={mode === m}
+							onClick={() => setError(null)}
+							className={`demo-pill no-underline ${mode === m ? 'outline outline-2 outline-[var(--lagoon)]' : ''}`}
+						>
+							{m === 'sign-in' ? 'Sign in' : 'Create account'}
+						</Link>
+					))}
+				</div>
 
 				<form
+					key={mode}
 					className="grid gap-4"
 					onSubmit={async (event) => {
 						event.preventDefault()
 						setBusy(true)
 						setError(null)
+						const data = new FormData(event.currentTarget)
 						try {
-							// Sends FormData; the server fn throws a redirect on success,
-							// which useServerFn hands to the router.
-							await loginFn({ data: new FormData(event.currentTarget) })
+							// On success both server fns throw a redirect, which
+							// useServerFn hands to the router.
+							if (mode === 'sign-in') {
+								await signInFn({ data })
+							} else {
+								const result = await signUpFn({ data })
+								if (result?.checkEmail) setCheckEmail(true)
+							}
 						} catch (err) {
-							setError(err instanceof Error ? err.message : 'Login failed')
+							setError(err instanceof Error ? err.message : 'Something went wrong')
 						} finally {
 							setBusy(false)
 						}
 					}}
 				>
 					<input type="hidden" name="redirect" value={search.redirect ?? '/quests'} />
+					{mode === 'sign-up' && (
+						<label className="grid gap-1 text-sm font-semibold">
+							Adventurer name
+							<input
+								name="name"
+								required
+								minLength={2}
+								maxLength={24}
+								autoComplete="nickname"
+								className="demo-input"
+								placeholder="e.g. Sir Procrastinot"
+							/>
+						</label>
+					)}
 					<label className="grid gap-1 text-sm font-semibold">
-						Adventurer name
+						Email
 						<input
-							name="name"
+							name="email"
+							type="email"
 							required
-							minLength={2}
-							maxLength={24}
-							autoComplete="username"
+							autoComplete="email"
 							className="demo-input"
-							placeholder="e.g. Sir Procrastinot"
 						/>
 					</label>
 					<label className="grid gap-1 text-sm font-semibold">
-						Passphrase
+						Password
 						<input
-							name="passphrase"
+							name="password"
 							type="password"
 							required
-							minLength={4}
-							autoComplete="current-password"
+							minLength={8}
+							autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
 							className="demo-input"
 						/>
 					</label>
 					{error && <p className="demo-alert demo-alert-danger m-0">{error}</p>}
 					<button type="submit" className="demo-button" disabled={busy}>
-						{busy ? 'Opening the gates…' : 'Enter the guild'}
+						{busy
+							? 'Opening the gates…'
+							: mode === 'sign-in'
+								? 'Enter the guild'
+								: 'Create my adventurer'}
 					</button>
 				</form>
 			</section>

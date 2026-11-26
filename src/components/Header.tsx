@@ -1,6 +1,6 @@
 import { Link, useRouteContext } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { logout } from '#/functions/auth.functions'
+import { signOut } from '#/functions/auth.functions'
 import ThemeToggle from './ThemeToggle'
 
 const NAV = [
@@ -14,8 +14,8 @@ const NAV = [
 export default function Header() {
 	// strict: false lets a shared component read context from any route.
 	const user = useRouteContext({ strict: false, select: (c) => c.user })
-	// useServerFn is required here: logout throws a redirect.
-	const logoutFn = useServerFn(logout)
+	// useServerFn is required here: signOut throws a redirect.
+	const signOutFn = useServerFn(signOut)
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
@@ -53,7 +53,7 @@ export default function Header() {
 							<button
 								type="button"
 								className="demo-button demo-button-secondary !px-3 !py-2"
-								onClick={() => logoutFn()}
+								onClick={() => signOutFn()}
 							>
 								Leave
 							</button>

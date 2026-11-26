@@ -14,7 +14,6 @@ export const DIFFICULTY_KEYS = ['easy', 'medium', 'epic'] as const satisfies Rea
 
 export type Quest = {
 	id: string
-	owner: string
 	title: string
 	notes: string
 	difficulty: Difficulty

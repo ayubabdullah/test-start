@@ -18,7 +18,7 @@ const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getIte
 
 export type RouterContext = {
 	appName: string
-	user: { name: string } | null
+	user: { id: string; name: string } | null
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

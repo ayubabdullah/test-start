@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { parseNewQuest, parseQuestSearch } from '#/lib/quests'
 import { apiAuth } from '#/middleware/auth'
-import { addQuest, listQuestsFor } from '#/server/quests.server'
+import { addQuest, listQuests } from '#/server/quests.server'
 
 /**
  * GET  /api/quests?status=active&sort=xp&q=dragon   → your quests
@@ -26,7 +26,7 @@ export const Route = createFileRoute('/api/quests')({
 						const search = parseQuestSearch(
 							Object.fromEntries(url.searchParams),
 						)
-						return Response.json(await listQuestsFor(context.user, search), {
+						return Response.json(await listQuests(context.supabase, search), {
 							headers: { 'Cache-Control': 'private, no-store' },
 						})
 					},
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/api/quests')({
 					handler: async ({ request, context }) => {
 						try {
 							const input = parseNewQuest(await request.json())
-							const quest = await addQuest(context.user, input)
+							const quest = await addQuest(context.supabase, input)
 							return Response.json(quest, { status: 201 })
 						} catch (error) {
 							return Response.json(

@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { leaderboard } from '#/server/quests.server'
+import { getSupabase } from '#/server/supabase.server'
 
 /** Public JSON endpoint: GET /api/leaderboard */
 export const Route = createFileRoute('/api/leaderboard')({
 	server: {
 		handlers: {
 			GET: async () => {
-				const rows = await leaderboard()
+				const rows = await leaderboard(getSupabase())
 				return Response.json(
 					rows.map(({ name, xp }) => ({
 						name,

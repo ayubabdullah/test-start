@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { apiAuth } from '#/middleware/auth'
-import { listQuestsFor, toCsv } from '#/server/quests.server'
+import { listQuests, toCsv } from '#/server/quests.server'
 
 /**
  * GET /api/quests.csv — the `[.]` in the filename escapes the dot so the
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/api/quests.csv')({
 		middleware: [apiAuth],
 		handlers: {
 			GET: async ({ context }) => {
-				const csv = toCsv(await listQuestsFor(context.user, { sort: 'oldest' }))
+				const csv = toCsv(await listQuests(context.supabase, { sort: 'oldest' }))
 				const date = new Date().toISOString().slice(0, 10)
 				return new Response(csv, {
 					headers: {

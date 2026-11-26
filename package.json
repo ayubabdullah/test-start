@@ -9,13 +9,18 @@
     "dev": "rsbuild dev --port 3000",
     "generate-routes": "rsbuild build",
     "build": "rsbuild build",
-    "start": "srvx --prod -s ../client dist/server/index.js",
+    "start": "node --env-file-if-exists=.env.local node_modules/srvx/bin/srvx.mjs --prod -s ../client dist/server/index.js",
     "preview": "rsbuild preview",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/lib/database.types.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.119.2",
     "@tanstack/react-devtools": "0.10.15",
     "@tanstack/react-router": "1.170.46",
     "@tanstack/react-router-devtools": "1.167.4",

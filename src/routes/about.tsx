@@ -38,7 +38,7 @@ const FEATURES: Array<{ group: string; items: Array<Feature> }> = [
 			{ name: 'FormData input', what: 'Forms post FormData straight to the server', where: ['src/functions/auth.functions.ts'] },
 			{ name: 'useServerFn', what: 'Wires thrown redirect() into the router', where: ['src/routes/login.tsx', 'src/components/Header.tsx'] },
 			{ name: 'Streaming responses', what: 'Async-generator server fn, consumed with for await', where: ['src/routes/_authed/oracle.tsx'] },
-			{ name: 'Request/response utils', what: 'getCookie/setCookie, setResponseHeaders, getRequestHeader', where: ['src/server/session.server.ts', 'src/functions/meta.functions.ts'] },
+			{ name: 'Request/response utils', what: 'getCookies/setCookie feed the Supabase session; getRequestHeader, setResponseHeader', where: ['src/server/supabase.server.ts', 'src/functions/meta.functions.ts'] },
 			{ name: 'Custom serialization', what: 'Xp class instances survive the network via createSerializationAdapter', where: ['src/lib/xp.ts', 'src/start.ts'] },
 		],
 	},
@@ -48,7 +48,7 @@ const FEATURES: Array<{ group: string; items: Array<Feature> }> = [
 			{ name: 'Global request middleware', what: 'Logger + x-questboard-time header on every request', where: ['src/start.ts'] },
 			{ name: 'CSRF protection', what: 'createCsrfMiddleware on non-GET requests', where: ['src/start.ts'] },
 			{ name: 'Function middleware (client + server)', what: 'sendContext both ways; powers the footer RPC badge', where: ['src/middleware/timing.ts'] },
-			{ name: 'Auth middleware', what: 'Composed middleware: session → requireUser', where: ['src/middleware/auth.ts'] },
+			{ name: 'Auth middleware', what: 'Composed middleware: supabase client → requireUser', where: ['src/middleware/auth.ts'] },
 		],
 	},
 	{
@@ -67,7 +67,7 @@ const FEATURES: Array<{ group: string; items: Array<Feature> }> = [
 			{ name: 'createServerOnlyFn / createClientOnlyFn', what: 'Throws if called on the wrong side', where: ['src/server/runtime.ts', 'src/lib/env.ts'] },
 			{ name: 'Import protection', what: '*.server.ts files + the server-only marker import', where: ['src/server/'] },
 			{ name: '<ClientOnly> & useHydrated', what: 'Browser-only UI without hydration mismatches', where: ['src/routes/about.tsx', 'src/components/Footer.tsx'] },
-			{ name: 'Environment variables', what: 'SESSION_SECRET read per request, never bundled', where: ['src/server/session.server.ts'] },
+			{ name: 'Environment variables', what: 'Supabase URL and key read per request, never bundled', where: ['src/server/supabase.server.ts'] },
 		],
 	},
 	{
@@ -77,6 +77,16 @@ const FEATURES: Array<{ group: string; items: Array<Feature> }> = [
 			{ name: "Selective SSR ('data-only')", what: 'Loader on the server, canvas chart rendered in the browser', where: ['src/routes/_authed/stats.tsx'] },
 			{ name: 'Static prerendering', what: 'This page is rendered to HTML at build time', where: ['rsbuild.config.ts'] },
 			{ name: 'Devtools', what: 'TanStack Devtools with the Router panel', where: ['src/routes/__root.tsx'] },
+		],
+	},
+	{
+		group: 'Supabase integration',
+		items: [
+			{ name: 'Cookie sessions via @supabase/ssr', what: 'One request-scoped server client wired to Start cookies', where: ['src/server/supabase.server.ts'] },
+			{ name: 'JWT verification', what: 'getClaims() in middleware guards every private server fn and API route', where: ['src/middleware/auth.ts'] },
+			{ name: 'Supabase Auth flows', what: 'Sign up, sign in, sign out, email confirmation link', where: ['src/functions/auth.functions.ts', 'src/routes/auth/confirm.tsx'] },
+			{ name: 'Row Level Security', what: 'Users can only read and write their own quests', where: ['supabase/migrations/'] },
+			{ name: 'Typed queries', what: 'Generated Database types flow into every query', where: ['src/lib/database.types.ts'] },
 		],
 	},
 ]

@@ -12,5 +12,3 @@ dist-ssr
 __unconfig*
 todos.json
 
-# QuestBoard data store
-.data
